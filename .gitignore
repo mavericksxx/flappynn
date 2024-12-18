@@ -5,3 +5,8 @@
 *.pyc
 *.pyo
 *.pyd
+ai/__pycache__/genetic.cpython-38.pyc
+ai/__pycache__/neural_network.cpython-38.pyc
+game/__pycache__/game.cpython-38.pyc
+game/__pycache__/pipe.cpython-38.pyc
+game/__pycache__/ui.cpython-38.pyc
