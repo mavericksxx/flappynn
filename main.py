@@ -3,14 +3,11 @@ from game.game import FlappyBirdGame
 from ai.genetic import GeneticAlgorithm
 
 def main():
-    # Initialize Pygame
-    pygame.init()
+    # Initialize genetic algorithm first
+    ga = GeneticAlgorithm(population_size=50)
     
-    # Create game instance
-    game = FlappyBirdGame()
-    
-    # Create genetic algorithm instance
-    ga = GeneticAlgorithm()
+    # Create game with genetic algorithm
+    game = FlappyBirdGame(genetic_algorithm=ga)
     
     # Create initial birds
     for i in range(ga.population_size):

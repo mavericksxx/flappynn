@@ -102,14 +102,18 @@ class GeneticAlgorithm:
         if not pipe:
             return
         
-        # Improved input normalization
-        horizontal_distance = (pipe.x + pipe.width - bird.x) / 300  # Shorter normalization distance
-        height_difference = (bird.y - (pipe.gap_y + pipe.gap_height/2)) / 200  # Shorter normalization distance
-        velocity = bird.velocity / 8  # Normalized by max velocity
+        # Get network inputs
+        horizontal_distance = (pipe.x + pipe.width - bird.x) / 300
+        height_difference = (bird.y - (pipe.gap_y + pipe.gap_height/2)) / 200
+        velocity = bird.velocity / 8
         
-        # Get network output using all three inputs
+        # Get network output
         network = self.population[bird.index]
         output = network.forward([horizontal_distance, height_difference, velocity])
+        
+        # Store current inputs and output for visualization
+        bird.current_inputs = [horizontal_distance, height_difference, velocity]
+        bird.current_output = output
         
         # Flap if output > 0.5
         if output > 0.5:

@@ -25,6 +25,10 @@ class NeuralNetwork:
         # Output layer
         output = self.sigmoid(np.dot(hidden, self.weights2) + self.bias2)
         
+        # Store activations for visualization
+        self.last_hidden_activations = hidden
+        self.last_output = output[0]
+        
         return output[0]  # Return scalar value
     
     def get_weights(self):

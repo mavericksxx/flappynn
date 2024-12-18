@@ -2,13 +2,20 @@ import pygame
 from .bird import Bird
 from .pipe import Pipe
 from .ui import UI
+from .network_visualizer import NetworkVisualizer
 
 class FlappyBirdGame:
-    def __init__(self, width=800, height=600):
+    def __init__(self, width=800, height=900, genetic_algorithm=None):
         self.width = width
         self.height = height
+        self.game_height = 600  # Original game height
+        self.bottom_height = 300  # Height of bottom section (metrics + network)
+        self.metrics_width = 300  # Width for metrics section
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Flappy Bird AI")
+        
+        # Store genetic algorithm reference
+        self.ga = genetic_algorithm
         
         self.clock = pygame.time.Clock()
         self.running = True
@@ -29,8 +36,16 @@ class FlappyBirdGame:
         
         self.game_speed = 1
         
-        # Add UI
-        self.ui = UI(width, height)
+        # Add UI with new dimensions
+        self.ui = UI(width, self.game_height, self.metrics_width, self.bottom_height)
+        
+        # Adjust network visualizer position and size - now on right side
+        self.network_vis = NetworkVisualizer(
+            self.metrics_width + 20,  # x position after metrics
+            self.game_height + 10,    # y position in bottom section
+            width - self.metrics_width - 30,  # remaining width minus padding
+            self.bottom_height - 20    # height minus padding
+        )
         
         # Initialize game state last
         self.reset()
@@ -40,10 +55,10 @@ class FlappyBirdGame:
         self.birds.clear()
         self.pipes.clear()
         
-        # Create initial pipes
+        # Create initial pipes - use game_height instead of height
         for i in range(3):
             x = 800 + i * self.pipe_distance  # Start pipes off screen
-            self.pipes.append(Pipe(x, self.height))
+            self.pipes.append(Pipe(x, self.game_height))  # Changed from self.height to self.game_height
             
     def add_bird(self, index):
         bird = Bird(150, self.height//2, index)
@@ -58,8 +73,8 @@ class FlappyBirdGame:
                 if bird.alive:
                     bird.update()
                     
-                    # Check collision with ground or ceiling
-                    if bird.y < 0 or bird.y > self.height - bird.height:
+                    # Check collision with ground or ceiling - use game_height
+                    if bird.y < 0 or bird.y > self.game_height - bird.height:  # Changed from self.height
                         bird.die()
                     
                     # Check collision with pipes and update score
@@ -86,7 +101,8 @@ class FlappyBirdGame:
         if self.pipes[0].x < -self.pipes[0].width:
             self.pipes.pop(0)
             last_pipe = self.pipes[-1]
-            self.pipes.append(Pipe(last_pipe.x + self.pipe_distance, self.height))
+            # Use game_height when creating new pipes
+            self.pipes.append(Pipe(last_pipe.x + self.pipe_distance, self.game_height))  # Changed from self.height
             
         # Get closest pipe for AI input
         closest_pipe = None
@@ -100,27 +116,54 @@ class FlappyBirdGame:
         return closest_pipe
         
     def draw(self):
-        # Clear screen
-        self.screen.fill((135, 206, 235))  # Sky blue
+        # Clear all sections with different colors
+        # Game section (sky blue)
+        self.screen.fill((135, 206, 235), (0, 0, self.width, self.game_height))
         
-        # Draw pipes
+        # Bottom section background (black for network vis)
+        self.screen.fill((0, 0, 0), 
+                        (0, self.game_height, self.width, self.bottom_height))
+        
+        # Metrics section (light gray)
+        self.screen.fill((220, 220, 220), 
+                        (0, self.game_height, self.metrics_width, self.bottom_height))
+        
+        # Draw separating lines
+        pygame.draw.line(self.screen, (100, 100, 100), 
+                        (0, self.game_height), 
+                        (self.width, self.game_height), 2)
+        pygame.draw.line(self.screen, (100, 100, 100), 
+                        (self.metrics_width, self.game_height), 
+                        (self.metrics_width, self.height), 2)
+        
+        # Draw game elements
         for pipe in self.pipes:
             pipe.draw(self.screen)
-            
-        # Draw birds
         for bird in self.birds:
             bird.draw(self.screen)
+            
+        # Update stats
+        self.stats['alive_birds'] = sum(1 for bird in self.birds if bird.alive)
+        self.stats['total_birds'] = len(self.birds)
+            
+        # Draw neural network visualization
+        alive_bird = next((bird for bird in self.birds if bird.alive), None)
+        if alive_bird and len(self.pipes) > 0:
+            closest_pipe = next((p for p in self.pipes if p.x + p.width > 150), None)
+            if closest_pipe:
+                horizontal_distance = (closest_pipe.x + closest_pipe.width - alive_bird.x) / 300
+                height_difference = (alive_bird.y - (closest_pipe.gap_y + closest_pipe.gap_height/2)) / 200
+                velocity = alive_bird.velocity / 8
+                inputs = [horizontal_distance, height_difference, velocity]
+                
+                network = self.ga.population[alive_bird.index]
+                output = network.forward(inputs)
+                
+                self.network_vis.generation = self.ga.generation
+                self.network_vis.draw(self.screen, network, inputs, output)
         
-        # Update stats before drawing UI
-        self.stats.update({
-            'alive_birds': len([b for b in self.birds if b.alive]),
-            'total_birds': len(self.birds),
-            'speed': self.game_speed
-        })
-        
-        # Draw UI
+        # Draw UI last
         self.ui.draw(self.screen, self.stats)
-        
         pygame.display.flip()
         
     def run_frame(self):
