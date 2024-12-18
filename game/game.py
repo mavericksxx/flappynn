@@ -120,13 +120,9 @@ class FlappyBirdGame:
         # Game section (sky blue)
         self.screen.fill((135, 206, 235), (0, 0, self.width, self.game_height))
         
-        # Bottom section background (black for network vis)
+        # Bottom section background (black for both metrics and network)
         self.screen.fill((0, 0, 0), 
                         (0, self.game_height, self.width, self.bottom_height))
-        
-        # Metrics section (light gray)
-        self.screen.fill((220, 220, 220), 
-                        (0, self.game_height, self.metrics_width, self.bottom_height))
         
         # Draw separating lines
         pygame.draw.line(self.screen, (100, 100, 100), 

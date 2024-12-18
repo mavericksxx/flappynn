@@ -18,19 +18,31 @@ class UI:
         self.font = pygame.font.SysFont('Arial', 24)
         self.small_font = pygame.font.SysFont('Arial', 16)
         
-        # Buttons - keep in game section
-        button_width = 100
-        button_height = 40
+        # Buttons - moved to metrics section
+        pause_width = 100
+        speed_width = 120  # Wider button for speed text
+        button_height = 30
         button_margin = 20
+        metrics_center_x = metrics_width // 2
         self.buttons = {
-            'pause': pygame.Rect(20, 20, button_width, button_height),
-            'speed': pygame.Rect(140, 20, button_width, button_height)
+            'pause': pygame.Rect(
+                metrics_center_x - speed_width - 10,  # Left of center, adjusted for wider speed button
+                game_height + button_margin,
+                pause_width,
+                button_height
+            ),
+            'speed': pygame.Rect(
+                metrics_center_x + 10,  # Right of center
+                game_height + button_margin,
+                speed_width,  # Using wider width for speed button
+                button_height
+            )
         }
         
         self.paused = False
         
     def draw(self, screen, stats):
-        # Draw buttons in game section
+        # Draw buttons in metrics section
         mouse_pos = pygame.mouse.get_pos()
         for button_name, button_rect in self.buttons.items():
             hover = button_rect.collidepoint(mouse_pos)
@@ -40,7 +52,7 @@ class UI:
             button_surface.fill(color)
             button_surface.set_alpha(230)
             screen.blit(button_surface, button_rect)
-            pygame.draw.rect(screen, self.BLACK, button_rect, 2)
+            pygame.draw.rect(screen, self.WHITE, button_rect, 2)  # White outline
             
             text = "Resume" if self.paused and button_name == 'pause' else "Pause" if button_name == 'pause' else f"Speed: {stats['speed']}x"
             text_surface = self.font.render(text, True, self.WHITE)
@@ -48,7 +60,7 @@ class UI:
             screen.blit(text_surface, text_rect)
         
         # Draw stats in metrics section
-        metrics_y = self.game_height + 20  # Start below game section
+        metrics_y = self.game_height + 70  # Start below buttons
         stats_text = [
             f"Generation: {stats['generation']}",
             f"Best Fitness: {stats['best_fitness']:.0f}",
@@ -56,14 +68,14 @@ class UI:
         ]
         
         # Add title for metrics section
-        title = self.font.render("Training Metrics", True, self.BLACK)
-        title_rect = title.get_rect(center=(self.metrics_width//2, self.game_height + 30))
+        title = self.font.render("Training Metrics", True, self.WHITE)  # Changed to white
+        title_rect = title.get_rect(center=(self.metrics_width//2, self.game_height + 120))  # Moved down below buttons
         screen.blit(title, title_rect)
-        metrics_y = self.game_height + 70  # Start metrics below centered title
+        metrics_y = title_rect.bottom + 20  # Start metrics below title
         
         # Draw metrics in centered column
         for text in stats_text:
-            text_surface = self.font.render(text, True, self.BLACK)
+            text_surface = self.font.render(text, True, self.WHITE)  # Changed to white
             text_rect = text_surface.get_rect(center=(self.metrics_width//2, metrics_y))
             screen.blit(text_surface, text_rect)
             metrics_y += 40
