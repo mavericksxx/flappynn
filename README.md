@@ -2,6 +2,8 @@
 
 An AI that learns to play Flappy Bird using neural networks and genetic algorithms, built with Pygame.
 
+![Flappy Bird AI Screenshot](assets/flappy-bird-ai.png)
+
 ## How It Works
 
 ### Neural Network Architecture
