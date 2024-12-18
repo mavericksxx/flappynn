@@ -1,6 +1,3 @@
-
-
-````markdown
 # Flappy Bird AI with Neural Networks & Genetic Algorithm
 
 An AI that learns to play Flappy Bird using neural networks and genetic algorithms, built with Pygame.
@@ -43,4 +40,3 @@ An AI that learns to play Flappy Bird using neural networks and genetic algorith
 ```bash
 python main.py
 ```
-````
