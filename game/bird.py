@@ -7,11 +7,11 @@ class Bird:
         self.y = y
         self.index = index
         
-        # Physics - adjusted for better control
+        # Physics
         self.velocity = 0
-        self.gravity = 0.4  # Reduced further
-        self.flap_strength = -7  # Reduced further
-        self.max_velocity = 8  # Add velocity cap
+        self.gravity = 0.4  
+        self.flap_strength = -7  
+        self.max_velocity = 8  
         
         # Dimensions
         self.width = 34
@@ -24,7 +24,7 @@ class Bird:
         self.distance = 0
         self.last_pipe_x = float('inf')
         
-        # Previous generation stats
+        # Previous gen stats
         self.fitness_prev = 0
         self.score_prev = 0
         
@@ -36,13 +36,10 @@ class Bird:
         if not self.alive:
             return
             
-        # Apply gravity
         self.velocity += self.gravity
-        # Cap velocity
         self.velocity = min(max(self.velocity, -self.max_velocity), self.max_velocity)
         self.y += self.velocity
         
-        # Update distance
         self.distance += 1
         
     def draw(self, screen):

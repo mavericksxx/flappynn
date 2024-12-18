@@ -6,7 +6,6 @@ class NeuralNetwork:
         self.hidden_size = hidden_size
         self.output_size = output_size
         
-        # Initialize weights with smaller values
         self.weights1 = np.random.randn(input_size, hidden_size) * 0.1
         self.weights2 = np.random.randn(hidden_size, output_size) * 0.1
         self.bias1 = np.random.randn(hidden_size) * 0.1
@@ -16,20 +15,16 @@ class NeuralNetwork:
         return 1 / (1 + np.exp(-x))
     
     def forward(self, inputs):
-        # Convert inputs to numpy array
         x = np.array(inputs)
-        
-        # Hidden layer
+
         hidden = self.sigmoid(np.dot(x, self.weights1) + self.bias1)
-        
-        # Output layer
+
         output = self.sigmoid(np.dot(hidden, self.weights2) + self.bias2)
         
-        # Store activations for visualization
         self.last_hidden_activations = hidden
         self.last_output = output[0]
         
-        return output[0]  # Return scalar value
+        return output[0]  
     
     def get_weights(self):
         return {

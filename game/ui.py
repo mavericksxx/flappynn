@@ -7,26 +7,22 @@ class UI:
         self.metrics_width = metrics_width
         self.bottom_height = bottom_height
         
-        # Colors
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.GRAY = (128, 128, 128)
         self.BLUE = (0, 120, 255)
-        
-        # Font
+
         pygame.font.init()
         self.font = pygame.font.SysFont('Arial', 24)
         self.small_font = pygame.font.SysFont('Arial', 16)
         
-        # Button dimensions
         button_width = 100
-        speed_button_width = 120  # Wider button for speed text
+        speed_button_width = 120 
         button_height = 30
         button_margin = 20
         button_spacing = 10
         metrics_center_x = metrics_width // 2
-        
-        # Calculate positions for pause and restart buttons (side by side)
+
         total_width = (button_width * 2) + button_spacing
         start_x = metrics_center_x - (total_width / 2)
         
@@ -44,9 +40,9 @@ class UI:
                 button_height
             ),
             'speed': pygame.Rect(
-                metrics_center_x - (speed_button_width / 2),  # Centered below other buttons
+                metrics_center_x - (speed_button_width / 2),  
                 game_height + button_margin + button_height + button_spacing,
-                speed_button_width,  # Using wider width for speed button
+                speed_button_width,  
                 button_height
             )
         }
@@ -54,7 +50,6 @@ class UI:
         self.paused = False
         
     def draw(self, screen, stats):
-        # Draw buttons in metrics section
         mouse_pos = pygame.mouse.get_pos()
         for button_name, button_rect in self.buttons.items():
             hover = button_rect.collidepoint(mouse_pos)
@@ -66,22 +61,19 @@ class UI:
             screen.blit(button_surface, button_rect)
             pygame.draw.rect(screen, self.WHITE, button_rect, 2)
             
-            # Determine button text
             if button_name == 'pause':
                 text = "Resume" if self.paused else "Pause"
             elif button_name == 'restart':
                 text = "Restart"
-            else:  # speed button
+            else:  
                 text = f"Speed: {stats['speed']}x"
                 
             text_surface = self.font.render(text, True, self.WHITE)
             text_rect = text_surface.get_rect(center=button_rect.center)
             screen.blit(text_surface, text_rect)
         
-        # Move metrics down to account for new button layout
-        metrics_y = self.game_height + 140  # Adjusted to start below all buttons
+        metrics_y = self.game_height + 140 
         
-        # Rest of the draw method remains the same...
         stats_text = [
             f"Generation: {stats['generation']}",
             f"Best Fitness: {stats['best_fitness']:.0f}",
@@ -100,11 +92,9 @@ class UI:
             metrics_y += 40
         
     def _draw_button(self, screen, rect, text):
-        # Draw button background
         pygame.draw.rect(screen, self.BLUE, rect)
         pygame.draw.rect(screen, self.BLACK, rect, 2)
-        
-        # Draw button text
+
         text_surface = self.font.render(text, True, self.WHITE)
         text_rect = text_surface.get_rect(center=rect.center)
         screen.blit(text_surface, text_rect)
@@ -118,6 +108,6 @@ class UI:
         x, y = pos
         for button_name, button_rect in self.buttons.items():
             if button_rect.collidepoint(x, y):
-                print(f"Button clicked: {button_name}")  # Debug print
+                print(f"Button clicked: {button_name}") 
                 return button_name
         return None
