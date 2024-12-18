@@ -1,3 +1,6 @@
 /.DS_Store
 /.venv
 /nnvis
+/ai/__pycache__
+/game/__pycache__
+/
