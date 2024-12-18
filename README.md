@@ -31,8 +31,6 @@ An AI that learns to play Flappy Bird using neural networks and genetic algorith
 - Network visualization
 - Performance metrics tracking
 
-[Screenshot or GIF of the game in action]
-
 ## Requirements
 - Python 3.x
 - Pygame
