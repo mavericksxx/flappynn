@@ -169,18 +169,37 @@ class FlappyBirdGame:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Make sure it's left click
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
                 button = self.ui.handle_click(pos)
                 if button == 'pause':
                     self.ui.paused = not self.ui.paused
-                    print(f"Pause button clicked, paused: {self.ui.paused}")
                 elif button == 'speed':
                     speeds = [1, 2, 5, 10]
                     current_index = speeds.index(self.game_speed) if self.game_speed in speeds else 0
                     self.game_speed = speeds[(current_index + 1) % len(speeds)]
-                    self.stats['speed'] = self.game_speed  # Update speed in stats
-                    print(f"Speed button clicked, new speed: {self.game_speed}x")
+                    self.stats['speed'] = self.game_speed
+                elif button == 'restart':
+                    # Reset genetic algorithm
+                    self.ga.generation = 1
+                    self.ga.best_fitness = 0
+                    self.ga.create_population()
+                    
+                    # Reset game state
+                    self.reset()
+                    self.birds.clear()
+                    
+                    # Create new birds
+                    for i in range(self.ga.population_size):
+                        self.add_bird(i)
+                    
+                    # Reset stats
+                    self.stats.update({
+                        'generation': 1,
+                        'best_fitness': 0,
+                        'speed': 1
+                    })
+                    self.game_speed = 1
         
         # Update game state if not paused
         if not self.ui.paused:
