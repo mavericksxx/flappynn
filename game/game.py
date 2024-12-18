@@ -1,4 +1,5 @@
 import pygame
+import os
 from .bird import Bird
 from .pipe import Pipe
 from .ui import UI
@@ -39,6 +40,10 @@ class FlappyBirdGame:
             width - self.metrics_width - 30,
             self.bottom_height - 20
         )
+        
+        current_dir = os.path.dirname(os.path.dirname(__file__))
+        self.background = pygame.image.load(os.path.join(current_dir, "assets", "background.png")).convert()
+        self.background = pygame.transform.scale(self.background, (width, self.game_height))
         
         self.reset()
 
@@ -93,7 +98,7 @@ class FlappyBirdGame:
         return closest_pipe
 
     def draw(self):
-        self.screen.fill((135, 206, 235), (0, 0, self.width, self.game_height))
+        self.screen.blit(self.background, (0, 0))
         self.screen.fill((0, 0, 0), (0, self.game_height, self.width, self.bottom_height))
         pygame.draw.line(self.screen, (100, 100, 100), (0, self.game_height), (self.width, self.game_height), 2)
         pygame.draw.line(self.screen, (100, 100, 100), (self.metrics_width, self.game_height), (self.metrics_width, self.height), 2)

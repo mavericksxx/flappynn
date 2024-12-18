@@ -1,4 +1,5 @@
 import pygame
+import os
 from game.game import FlappyBirdGame
 from ai.genetic import GeneticAlgorithm
 
@@ -12,6 +13,7 @@ def main():
     game_speeds = [1, 2, 5, 10]
     speed_index = 0
     
+    pygame.init()
     while game.running:
         game.stats.update({
             'generation': ga.generation,
@@ -53,7 +55,7 @@ def main():
                 f"Speed: {game.game_speed}x - "
                 f"Best Fitness: {ga.best_fitness:.0f}"
             )
-    
+
     pygame.quit()
 
 if __name__ == "__main__":

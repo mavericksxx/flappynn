@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import os
 
 class Bird:
     def __init__(self, x, y, index):
@@ -28,6 +29,10 @@ class Bird:
         self.fitness_prev = 0
         self.score_prev = 0
         
+        current_dir = os.path.dirname(os.path.dirname(__file__))
+        self.image = pygame.image.load(os.path.join(current_dir, "assets", "flappy-bird.png")).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        
     def flap(self):
         if self.alive:
             self.velocity = self.flap_strength
@@ -46,8 +51,7 @@ class Bird:
         if not self.alive:
             return
             
-        color = (255, 255, 0) if self.alive else (150, 150, 150)
-        pygame.draw.rect(screen, color, (self.x, self.y, self.width, self.height))
+        screen.blit(self.image, (self.x, self.y))
     
     def die(self):
         self.alive = False

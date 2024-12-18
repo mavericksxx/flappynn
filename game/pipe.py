@@ -1,5 +1,6 @@
 import pygame
 import random
+import os
 
 class Pipe:
     def __init__(self, x, game_height):
@@ -13,17 +14,21 @@ class Pipe:
         max_gap_y = game_height - 150 - self.gap_height
         self.gap_y = random.randint(min_gap_y, max_gap_y)
         
+        current_dir = os.path.dirname(os.path.dirname(__file__))
+        self.image = pygame.image.load(os.path.join(current_dir, "assets", "pipe.png")).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.width, game_height))
+        
     def update(self):
         self.x -= self.speed
         
     def draw(self, screen):
-        pygame.draw.rect(screen, (0, 255, 0), 
-                        (self.x, 0, self.width, self.gap_y))
+        top_pipe = pygame.transform.scale(self.image, (self.width, self.gap_y))
+        screen.blit(top_pipe, (self.x, 0))
         
-        bottom_pipe_y = self.gap_y + self.gap_height
-        bottom_pipe_height = self.game_height - bottom_pipe_y
-        pygame.draw.rect(screen, (0, 255, 0),
-                        (self.x, bottom_pipe_y, self.width, bottom_pipe_height))
+        bottom_height = self.game_height - (self.gap_y + self.gap_height)
+        bottom_pipe = pygame.transform.scale(self.image, (self.width, bottom_height))
+        bottom_pipe = pygame.transform.flip(bottom_pipe, False, True)
+        screen.blit(bottom_pipe, (self.x, self.gap_y + self.gap_height))
     
     def get_rects(self):
         top_rect = pygame.Rect(self.x, 0, self.width, self.gap_y)
