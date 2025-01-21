@@ -1,0 +1,19 @@
+flappy-bird-ai-web/
+├── static/
+│   ├── js/
+│   │   ├── game.js
+│   │   ├── bird.js
+│   │   ├── pipe.js
+│   │   ├── neural_network.js
+│   │   ├── ui.js
+│   │   └── genetic.js
+│   ├── css/
+│   │   └── style.css
+│   └── assets/
+│       ├── background.png
+│       ├── pipe.png
+│       └── flappy-bird.png
+├── templates/
+│   └── index.html
+├── app.py
+└── requirements.txt 
