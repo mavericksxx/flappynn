@@ -52,13 +52,12 @@ class UI {
     }
     
     handleMouseMove(event) {
-        const rect = event.target.getBoundingClientRect();
-        const scaleX = event.target.width / rect.width;
-        const scaleY = event.target.height / rect.height;
+        const canvas = document.getElementById('gameCanvas');
+        const rect = canvas.getBoundingClientRect();
         
         this.mousePos = {
-            x: (event.clientX - rect.left) * scaleX,
-            y: (event.clientY - rect.top) * scaleY
+            x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+            y: ((event.clientY - rect.top) / rect.height) * canvas.height
         };
     }
     
@@ -130,13 +129,12 @@ class UI {
     }
     
     handleClick(pos) {
-        const rect = document.getElementById('gameCanvas').getBoundingClientRect();
-        const scaleX = document.getElementById('gameCanvas').width / rect.width;
-        const scaleY = document.getElementById('gameCanvas').height / rect.height;
+        const canvas = document.getElementById('gameCanvas');
+        const rect = canvas.getBoundingClientRect();
         
         const scaledPos = {
-            x: pos.x * scaleX,
-            y: pos.y * scaleY
+            x: (pos.x / rect.width) * canvas.width,
+            y: (pos.y / rect.height) * canvas.height
         };
         
         for (const [buttonName, button] of Object.entries(this.buttons)) {
