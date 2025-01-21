@@ -1,5 +1,76 @@
 class FlappyBirdGame {
     constructor() {
+        // Add mobile check before initializing
+        if (this.isMobileDevice()) {
+            this.showMobileWarning().then(() => {
+                this.initializeGame();
+            });
+        } else {
+            this.initializeGame();
+        }
+    }
+
+    isMobileDevice() {
+        return (window.innerWidth <= 800) || 
+               ('ontouchstart' in window) ||
+               (navigator.maxTouchPoints > 0);
+    }
+
+    showMobileWarning() {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                background: #2a2a2a;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                max-width: 80%;
+                color: white;
+                font-family: Arial, sans-serif;
+            `;
+
+            const message = document.createElement('p');
+            message.textContent = 'This application was designed for desktop viewing. The experience might be different on mobile devices.';
+            message.style.marginBottom = '20px';
+
+            const button = document.createElement('button');
+            button.textContent = 'I Understand';
+            button.style.cssText = `
+                background: #0078ff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            `;
+
+            button.addEventListener('click', () => {
+                document.body.removeChild(overlay);
+                resolve();
+            });
+
+            popup.appendChild(message);
+            popup.appendChild(button);
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+        });
+    }
+
+    initializeGame() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         
