@@ -13,36 +13,41 @@ class UI {
         this.BLUE = 'rgb(0, 120, 255)';
         
         // Button dimensions matching Python
-        this.buttonWidth = 140;
+        this.buttonWidth = 100;
         this.speedButtonWidth = 160;
         this.buttonHeight = 40;
-        this.buttonMargin = 30;
-        this.buttonSpacing = 15;
+        this.buttonSpacing = 20;
         this.metricsCenterX = metricsWidth / 2;
         
         // Calculate button positions
-        const totalWidth = (this.buttonWidth * 2) + this.buttonSpacing;
-        const startX = this.metricsCenterX - (totalWidth / 2);
+        const totalWidth = (this.buttonWidth * 3) + this.buttonSpacing;
+        const startX = this.gameWidth + 20;
         
-        // Button rectangles
+        // Create buttons
         this.buttons = {
             pause: {
                 x: startX,
-                y: gameHeight + this.buttonMargin,
+                y: 20,
                 width: this.buttonWidth,
-                height: this.buttonHeight
-            },
-            restart: {
-                x: startX + this.buttonWidth + this.buttonSpacing,
-                y: gameHeight + this.buttonMargin,
-                width: this.buttonWidth,
-                height: this.buttonHeight
+                height: this.buttonHeight,
+                text: 'Pause',
+                hover: false
             },
             speed: {
-                x: this.metricsCenterX - (this.speedButtonWidth / 2),
-                y: gameHeight + this.buttonMargin + this.buttonHeight + this.buttonSpacing,
-                width: this.speedButtonWidth,
-                height: this.buttonHeight
+                x: startX + this.buttonWidth + this.buttonSpacing,
+                y: 20,
+                width: this.buttonWidth,
+                height: this.buttonHeight,
+                text: 'Speed: 1x',
+                hover: false
+            },
+            restart: {
+                x: startX + (this.buttonWidth + this.buttonSpacing) * 2,
+                y: 20,
+                width: this.buttonWidth,
+                height: this.buttonHeight,
+                text: 'Restart',
+                hover: false
             }
         };
         
@@ -63,14 +68,15 @@ class UI {
     }
     
     handleMouseMove(event) {
-        const canvasRect = event.target.getBoundingClientRect();
-        const scaleX = event.target.width / canvasRect.width;
-        const scaleY = event.target.height / canvasRect.height;
-        
-        this.mousePos = {
-            x: (event.clientX - canvasRect.left) * scaleX,
-            y: (event.clientY - canvasRect.top) * scaleY
+        const rect = event.target.getBoundingClientRect();
+        const pos = {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
         };
+
+        for (const button of Object.values(this.buttons)) {
+            button.hover = this.isInside(pos, button);
+        }
     }
     
     draw(ctx, stats) {
@@ -89,62 +95,24 @@ class UI {
         ctx.lineTo(this.gameWidth, this.height);
         ctx.stroke();
         
-        // Calculate button positions relative to game width
-        const buttonStartX = this.gameWidth + (this.metricsWidth - (this.buttonWidth * 2 + this.buttonSpacing)) / 2;
-        
-        // Update button positions to match where they're actually drawn
-        this.buttons = {
-            pause: {
-                x: buttonStartX,
-                y: 20,
-                width: this.buttonWidth,
-                height: this.buttonHeight
-            },
-            restart: {
-                x: buttonStartX + this.buttonWidth + this.buttonSpacing,
-                y: 20,
-                width: this.buttonWidth,
-                height: this.buttonHeight
-            },
-            speed: {
-                x: this.gameWidth + (this.metricsWidth - this.speedButtonWidth) / 2,
-                y: 20 + this.buttonHeight + this.buttonSpacing,
-                width: this.speedButtonWidth,
-                height: this.buttonHeight
-            }
-        };
+        // Update speed button text
+        this.buttons.speed.text = `Speed: ${stats.speed}x`;
+        this.buttons.pause.text = this.paused ? 'Resume' : 'Pause';
         
         // Draw buttons
-        for (const [buttonName, button] of Object.entries(this.buttons)) {
-            const hover = this.isPointInRect(mousePos, button);
-            const color = hover ? 'rgb(0, 150, 255)' : this.BLUE;
-            
-            // Draw button background
-            ctx.fillStyle = color;
-            ctx.globalAlpha = this.buttonAlpha / 255;
+        for (const button of Object.values(this.buttons)) {
+            ctx.fillStyle = button.hover ? '#444' : '#333';
             ctx.fillRect(button.x, button.y, button.width, button.height);
-            ctx.globalAlpha = 1;
             
-            // Draw button border
-            ctx.strokeStyle = this.WHITE;
+            ctx.strokeStyle = '#555';
             ctx.lineWidth = 2;
             ctx.strokeRect(button.x, button.y, button.width, button.height);
             
-            // Draw button text
-            let text;
-            if (buttonName === 'pause') {
-                text = this.paused ? "Resume" : "Pause";
-            } else if (buttonName === 'restart') {
-                text = "Restart";
-            } else {
-                text = `Speed: ${stats.speed}x`;
-            }
-            
-            ctx.font = this.font;
-            ctx.fillStyle = this.WHITE;
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, button.x + button.width/2, button.y + button.height/2);
+            ctx.fillText(button.text, button.x + button.width/2, button.y + button.height/2);
         }
         
         // Draw metrics text with more space at the bottom
@@ -178,22 +146,18 @@ class UI {
     }
     
     handleClick(pos) {
-        // Ensure pos coordinates are properly scaled relative to canvas
-        const canvasRect = document.getElementById('gameCanvas').getBoundingClientRect();
-        const scaleX = document.getElementById('gameCanvas').width / canvasRect.width;
-        const scaleY = document.getElementById('gameCanvas').height / canvasRect.height;
-        
-        const scaledPos = {
-            x: pos.x * scaleX,
-            y: pos.y * scaleY
-        };
-        
-        for (const [buttonName, button] of Object.entries(this.buttons)) {
-            if (this.isPointInRect(scaledPos, button)) {
-                console.log(`Button clicked: ${buttonName}`);
-                return buttonName;
+        for (const [name, button] of Object.entries(this.buttons)) {
+            if (this.isInside(pos, button)) {
+                return name;
             }
         }
         return null;
+    }
+
+    isInside(pos, button) {
+        return pos.x > button.x && 
+               pos.x < button.x + button.width &&
+               pos.y > button.y && 
+               pos.y < button.y + button.height;
     }
 } 
