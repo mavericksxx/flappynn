@@ -251,7 +251,7 @@ class FlappyBirdGame {
                 this.background.onerror = reject;
             });
             
-            this.background.src = '/static/assets/background.png';
+            this.background.src = './static/assets/background.png';
             await backgroundLoaded;
             
             console.log('Assets loaded successfully');
