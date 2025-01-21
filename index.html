@@ -25,6 +25,12 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <script src="/static/js/game.js"></script>
+    <!-- Load dependencies first -->
+    <script src="./static/js/neural_network.js"></script>
+    <script src="./static/js/genetic.js"></script>
+    <script src="./static/js/bird.js"></script>
+    <script src="./static/js/pipe.js"></script>
+    <!-- Load main game file last -->
+    <script src="./static/js/game.js"></script>
 </body>
 </html> 
