@@ -142,7 +142,6 @@ class FlappyBirdGame {
     }
     
     setupControls() {
-        // Add click listener to canvas
         this.canvas.addEventListener('click', (event) => {
             const rect = this.canvas.getBoundingClientRect();
             const pos = {
@@ -151,6 +150,7 @@ class FlappyBirdGame {
             };
             
             const button = this.ui.handleClick(pos);
+            
             if (button === 'pause') {
                 this.paused = !this.paused;
                 this.ui.paused = this.paused;
@@ -167,16 +167,13 @@ class FlappyBirdGame {
             }
         });
 
-        // Add mousemove listener for button hover effects
         this.canvas.addEventListener('mousemove', (event) => {
             this.ui.handleMouseMove(event);
         });
 
-        // Add debug mode toggle
         window.addEventListener('keypress', (event) => {
             if (event.key === 'd') {
                 window.debugMode = !window.debugMode;
-                console.log('Debug mode:', window.debugMode);
             }
         });
     }
