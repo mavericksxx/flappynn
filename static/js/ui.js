@@ -13,11 +13,11 @@ class UI {
         this.BLUE = 'rgb(0, 120, 255)';
         
         // Button dimensions matching Python
-        this.buttonWidth = 100;
-        this.speedButtonWidth = 120;
-        this.buttonHeight = 30;
-        this.buttonMargin = 20;
-        this.buttonSpacing = 10;
+        this.buttonWidth = 140;
+        this.speedButtonWidth = 160;
+        this.buttonHeight = 40;
+        this.buttonMargin = 30;
+        this.buttonSpacing = 15;
         this.metricsCenterX = metricsWidth / 2;
         
         // Calculate button positions
@@ -49,8 +49,8 @@ class UI {
         this.paused = false;
         
         // Match Python's font initialization
-        this.font = '24px Arial';
-        this.smallFont = '16px Arial';
+        this.font = '32px Arial';
+        this.smallFont = '24px Arial';
         
         // Add alpha value to match Python's surface alpha
         this.buttonAlpha = 230;  // Matches Python's set_alpha(230)
@@ -63,10 +63,13 @@ class UI {
     }
     
     handleMouseMove(event) {
-        const rect = event.target.getBoundingClientRect();
+        const canvasRect = event.target.getBoundingClientRect();
+        const scaleX = event.target.width / canvasRect.width;
+        const scaleY = event.target.height / canvasRect.height;
+        
         this.mousePos = {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top
+            x: (event.clientX - canvasRect.left) * scaleX,
+            y: (event.clientY - canvasRect.top) * scaleY
         };
     }
     
@@ -74,8 +77,8 @@ class UI {
         // Use stored mouse position
         const mousePos = this.mousePos;
         
-        // Draw metrics background (now on the right side)
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';  // Make background more opaque
+        // Draw metrics background (on the right side)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(this.gameWidth, 0, this.metricsWidth, this.height);
         
         // Add a separator line
@@ -86,14 +89,14 @@ class UI {
         ctx.lineTo(this.gameWidth, this.height);
         ctx.stroke();
         
-        // Draw buttons (now on the right side)
-        const buttonStartX = this.gameWidth + (this.metricsWidth - this.buttonWidth * 2 - this.buttonSpacing) / 2;
+        // Calculate button positions relative to game width
+        const buttonStartX = this.gameWidth + (this.metricsWidth - (this.buttonWidth * 2 + this.buttonSpacing)) / 2;
         
-        // Update button positions
+        // Update button positions to match where they're actually drawn
         this.buttons = {
             pause: {
                 x: buttonStartX,
-                y: 20,  // Top margin
+                y: 20,
                 width: this.buttonWidth,
                 height: this.buttonHeight
             },
@@ -145,7 +148,7 @@ class UI {
         }
         
         // Draw metrics text
-        let metricsY = 120;  // Start below buttons
+        let metricsY = 150;  // Increased from 120
         
         ctx.font = this.font;
         ctx.fillStyle = this.WHITE;
@@ -154,7 +157,7 @@ class UI {
         // Draw title
         const title = "Training Metrics";
         ctx.fillText(title, this.gameWidth + this.metricsWidth/2, metricsY);
-        metricsY += 40;
+        metricsY += 50;
         
         // Draw stats
         const statsText = [
@@ -165,7 +168,7 @@ class UI {
         
         for (const text of statsText) {
             ctx.fillText(text, this.gameWidth + this.metricsWidth/2, metricsY);
-            metricsY += 30;
+            metricsY += 40;
         }
     }
     
@@ -175,8 +178,18 @@ class UI {
     }
     
     handleClick(pos) {
+        // Ensure pos coordinates are properly scaled relative to canvas
+        const canvasRect = document.getElementById('gameCanvas').getBoundingClientRect();
+        const scaleX = document.getElementById('gameCanvas').width / canvasRect.width;
+        const scaleY = document.getElementById('gameCanvas').height / canvasRect.height;
+        
+        const scaledPos = {
+            x: pos.x * scaleX,
+            y: pos.y * scaleY
+        };
+        
         for (const [buttonName, button] of Object.entries(this.buttons)) {
-            if (this.isPointInRect(pos, button)) {
+            if (this.isPointInRect(scaledPos, button)) {
                 console.log(`Button clicked: ${buttonName}`);
                 return buttonName;
             }

@@ -19,6 +19,10 @@ canvas {
     display: block;
     margin: 0;
     background-color: #000;
+    max-width: 98vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
 }
 
 .controls {

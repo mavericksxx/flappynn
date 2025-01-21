@@ -4,11 +4,11 @@ class FlappyBirdGame {
         this.ctx = this.canvas.getContext('2d');
         
         // Match Python dimensions
-        this.width = 1200;          // Total canvas width
-        this.height = 600;          // Canvas height
-        this.gameWidth = 800;       // Game area width
-        this.gameHeight = 600;      // Game area height
-        this.metricsWidth = 400;    // Width of right panel
+        this.width = 1600;          // Total canvas width
+        this.height = 800;          // Canvas height
+        this.gameWidth = 1100;      // Game area width
+        this.gameHeight = 800;      // Game area height
+        this.metricsWidth = 500;    // Width of right panel
         this.bottomHeight = this.height;  // Full height for right panel
         
         this.canvas.width = this.width;
@@ -142,9 +142,12 @@ class FlappyBirdGame {
         this.birds = [];
         this.pipes = [];
         
+        // Initialize pipes starting from a closer position
+        const initialX = this.gameWidth / 2;  // Start first pipe halfway through game area
+        
         // Match Python pipe initialization
         for (let i = 0; i < 3; i++) {
-            const x = this.gameWidth + i * this.pipeDistance;  // Start from game width
+            const x = initialX + i * this.pipeDistance;  // Start from halfway point
             this.pipes.push(new Pipe(x, this.gameHeight));
         }
     }
@@ -278,11 +281,11 @@ class FlappyBirdGame {
         // Remove off-screen pipes
         this.pipes = this.pipes.filter(pipe => pipe.x + pipe.width > 0);
         
-        // Add new pipes
-        if (this.pipes.length < 3) {
-            const lastPipe = this.pipes[this.pipes.length - 1];
-            const x = lastPipe ? lastPipe.x + this.pipeDistance : this.width;
-            this.pipes.push(new Pipe(x, this.gameHeight));
+        // Add new pipes when the rightmost pipe is less than 2/3 of the game width
+        const rightmostPipe = this.pipes[this.pipes.length - 1];
+        if (rightmostPipe && rightmostPipe.x < this.gameWidth * 0.8) {
+            const newPipeX = rightmostPipe.x + this.pipeDistance;
+            this.pipes.push(new Pipe(newPipeX, this.gameHeight));
         }
     }
     
@@ -438,27 +441,33 @@ class FlappyBirdGame {
         }
 
         // Constants for visualization
-        const NODE_RADIUS = 12;
+        const NODE_RADIUS = 10;  // Reduced from 12
         const POSITIVE_COLOR = 'rgb(255, 255, 255)';
         const NEGATIVE_COLOR = 'rgb(255, 0, 0)';
         const BACKGROUND_COLOR = 'rgb(20, 20, 20)';
         
-        // Calculate positions for the right side panel
-        const x = this.gameWidth + 20;  // Start after game area
-        const y = 250;  // Start below metrics
-        const width = this.metricsWidth - 40;  // Leave margins
-        const height = 300;  // Fixed height for network visualization
+        // Calculate positions for the right side panel - moved lower to avoid metrics
+        const x = this.gameWidth + 20;
+        const y = 400;  // Moved down from 250
+        const width = this.metricsWidth - 40;
+        const height = 250;  // Reduced from 300
         
         // Draw background
         this.ctx.fillStyle = BACKGROUND_COLOR;
         this.ctx.fillRect(x, y, width, height);
         
-        // Calculate node positions
+        // Add title for the network visualization
+        this.ctx.fillStyle = this.WHITE;
+        this.ctx.font = '20px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Neural Network', x + width/2, y - 10);
+        
+        // Calculate node positions with adjusted spacing
         const layerSpacing = width / 3;
         const inputNodes = bird.currentInputs.map((val, i) => ({
             x: x + layerSpacing * 0.5,
             y: y + height * (i + 1) / (bird.currentInputs.length + 1),
-            value: val || 0  // Default to 0 if null
+            value: val || 0
         }));
         
         const hiddenNodes = network.weights1[0].map((_, i) => ({
