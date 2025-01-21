@@ -500,71 +500,61 @@ class FlappyBirdGame {
     }
     
     drawNeuralNetwork(bird, closestPipe) {
-        // Early return if we don't have valid data
-        if (!bird || !bird.currentInputs || !this.ga.population[bird.index]) {
-            return;
-        }
-
+        if (!bird || !bird.currentInputs || !this.ga.population[bird.index]) return;
         const network = this.ga.population[bird.index];
-        if (!network || !network.weights1 || !network.weights2) {
-            return;
-        }
+        if (!network || !network.weights1 || !network.weights2) return;
 
-        // Constants for visualization matching Python
-        const NODE_RADIUS = 12;
+        const NODE_RADIUS = 15;
         const NODE_OUTLINE = 'rgb(255, 255, 255)';
         const POSITIVE_COLOR = 'rgb(255, 255, 255)';
         const NEGATIVE_COLOR = 'rgb(255, 0, 0)';
-        const BACKGROUND_COLOR = 'rgb(20, 20, 20)';
+        const BACKGROUND_COLOR = 'rgb(0, 0, 0)';
         const BORDER_COLOR = 'rgb(50, 50, 50)';
         
-        // Calculate positions for the right side panel - adjusted to avoid metrics
         const x = this.gameWidth + 20;
-        const y = 300;  // Moved down to avoid metrics
+        const y = 300;
         const width = this.metricsWidth - 40;
-        const height = 350;  // Slightly reduced height to fit better
+        const height = 350;
         
-        // Draw background and border
         this.ctx.fillStyle = BACKGROUND_COLOR;
         this.ctx.fillRect(x, y, width, height);
         this.ctx.strokeStyle = BORDER_COLOR;
         this.ctx.lineWidth = 1;
         this.ctx.strokeRect(x, y, width, height);
         
-        // Calculate layer positions
         const layerSpacing = width / 3;
         const inputLayerX = x + layerSpacing * 0.5;
         const hiddenLayerX = x + layerSpacing * 1.5;
         const outputLayerX = x + layerSpacing * 2.5;
         
-        // Calculate node positions
+        const inputSpacing = height / (bird.currentInputs.length + 1);
+        const hiddenSpacing = height / (network.weights1[0].length + 1);
+        
         const inputNodes = bird.currentInputs.map((val, i) => ({
             x: inputLayerX,
-            y: y + height * (i + 1) / (bird.currentInputs.length + 1),
+            y: y + (i + 1) * inputSpacing,
             value: val
         }));
         
         const hiddenNodes = network.weights1[0].map((_, i) => ({
             x: hiddenLayerX,
-            y: y + height * (i + 1) / (network.weights1[0].length + 1),
+            y: y + (i + 1) * hiddenSpacing,
             value: (network.lastHiddenActivations && network.lastHiddenActivations[i]) || 0
         }));
         
         const outputNode = {
             x: outputLayerX,
-            y: y + height / 2,
+            y: y + height/2,
             value: bird.currentOutput || 0
         };
         
-        // Draw connections with transparency
         this.ctx.lineWidth = 1;
         
-        // Input to hidden connections
         inputNodes.forEach((input, i) => {
             hiddenNodes.forEach((hidden, j) => {
                 const weight = network.weights1[i][j];
                 const alpha = Math.min(Math.abs(weight), 1);
-                this.ctx.strokeStyle = `rgba(${weight > 0 ? '255,255,255' : '255,0,0'},${alpha * 0.5})`;
+                this.ctx.strokeStyle = `rgba(${weight > 0 ? '255,255,255' : '255,0,0'},${alpha})`;
                 this.ctx.beginPath();
                 this.ctx.moveTo(input.x, input.y);
                 this.ctx.lineTo(hidden.x, hidden.y);
@@ -572,74 +562,64 @@ class FlappyBirdGame {
             });
         });
         
-        // Hidden to output connections
         hiddenNodes.forEach((hidden, i) => {
             const weight = network.weights2[i][0];
             const alpha = Math.min(Math.abs(weight), 1);
-            this.ctx.strokeStyle = `rgba(${weight > 0 ? '255,255,255' : '255,0,0'},${alpha * 0.5})`;
+            this.ctx.strokeStyle = `rgba(${weight > 0 ? '255,255,255' : '255,0,0'},${alpha})`;
             this.ctx.beginPath();
             this.ctx.moveTo(hidden.x, hidden.y);
             this.ctx.lineTo(outputNode.x, outputNode.y);
             this.ctx.stroke();
         });
         
-        // Function to draw a neuron
         const drawNeuron = (node) => {
-            // Draw outline
             this.ctx.strokeStyle = NODE_OUTLINE;
             this.ctx.lineWidth = 1;
             this.ctx.beginPath();
             this.ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
             this.ctx.stroke();
             
-            // Fill circle
             this.ctx.fillStyle = node.value >= 0 ? POSITIVE_COLOR : NEGATIVE_COLOR;
             this.ctx.beginPath();
             this.ctx.arc(node.x, node.y, NODE_RADIUS - 1, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Draw value
             this.ctx.fillStyle = node.value >= 0 ? 'black' : 'white';
-            this.ctx.font = '10px Arial';
+            this.ctx.font = '12px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText(node.value.toFixed(2), node.x, node.y);
         };
         
-        // Draw all nodes
         inputNodes.forEach(drawNeuron);
         hiddenNodes.forEach(drawNeuron);
         drawNeuron(outputNode);
         
-        // Draw network info
         this.ctx.font = '12px Arial';
         this.ctx.fillStyle = 'rgb(150, 150, 150)';
         this.ctx.textAlign = 'left';
         const connectionCount = (inputNodes.length * hiddenNodes.length) + hiddenNodes.length;
         const infoText = `Generation: ${this.stats.generation}, Neurons: ${hiddenNodes.length}, Connections: ${connectionCount}`;
-        this.ctx.fillText(infoText, x + 10, y + height - 20);
+        this.ctx.fillText(infoText, x + 10, y + height - 10);
         
-        // Draw legend
-        const legendY = y + height - 20;
-        // Negative weight line
-        this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+        const legendY = y + height - 10;
+        this.ctx.strokeStyle = 'rgba(255, 0, 0, 1)';
         this.ctx.beginPath();
         this.ctx.moveTo(x + width - 50, legendY);
         this.ctx.lineTo(x + width - 35, legendY);
         this.ctx.stroke();
-        // Positive weight line
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
         this.ctx.beginPath();
         this.ctx.moveTo(x + width - 30, legendY);
         this.ctx.lineTo(x + width - 15, legendY);
         this.ctx.stroke();
         
-        // Legend text
         this.ctx.font = '10px Arial';
         this.ctx.fillStyle = 'rgb(150, 150, 150)';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('-ve', x + width - 50, legendY - 15);
-        this.ctx.fillText('+ve', x + width - 30, legendY - 15);
+        this.ctx.fillText('-ve', x + width - 50, legendY - 5);
+        this.ctx.fillText('+ve', x + width - 30, legendY - 5);
     }
     
     updateStats() {
