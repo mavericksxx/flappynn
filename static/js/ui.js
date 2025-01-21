@@ -147,8 +147,8 @@ class UI {
             ctx.fillText(text, button.x + button.width/2, button.y + button.height/2);
         }
         
-        // Draw metrics text
-        let metricsY = 150;  // Increased from 120
+        // Draw metrics text with more space at the bottom
+        let metricsY = 150;  // Start position
         
         ctx.font = this.font;
         ctx.fillStyle = this.WHITE;
@@ -157,9 +157,9 @@ class UI {
         // Draw title
         const title = "Training Metrics";
         ctx.fillText(title, this.gameWidth + this.metricsWidth/2, metricsY);
-        metricsY += 50;
+        metricsY += 40;
         
-        // Draw stats
+        // Draw stats with less vertical spacing
         const statsText = [
             `Generation: ${stats.generation}`,
             `Best Fitness: ${Math.floor(stats.bestFitness)}`,
@@ -168,7 +168,7 @@ class UI {
         
         for (const text of statsText) {
             ctx.fillText(text, this.gameWidth + this.metricsWidth/2, metricsY);
-            metricsY += 40;
+            metricsY += 35;  // Reduced spacing between stats
         }
     }
     
