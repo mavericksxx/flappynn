@@ -1,8 +1,0 @@
-/.DS_Store
-/ai/.DS_Store
-/.venv
-/nnvis
-**/__pycache__/
-*.pyc
-*.pyo
-*pyd
