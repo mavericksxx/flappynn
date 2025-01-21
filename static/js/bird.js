@@ -4,7 +4,6 @@ class Bird {
         this.y = y;
         this.index = index;
         
-        // Adjusted physics constants
         this.gravity = 0.4;         // Increased from 0.35
         this.flapStrength = -6.5;   // Adjusted from -5.5
         this.maxVelocity = 10;      // Increased from 8

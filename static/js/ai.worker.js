@@ -1,13 +1,8 @@
-// Remove the importScripts line since we're implementing everything in the worker
-// self.importScripts('neural_network.js');
-
-// Neural Network functions for Web Worker
 function sigmoid(x) {
     return 1 / (1 + Math.exp(-Math.max(-10, Math.min(10, x))));
 }
 
 function forward(inputs, weights1, weights2, bias1, bias2) {
-    // Normalize inputs
     const normalizedInputs = inputs.map(x => Math.max(-1, Math.min(1, x)));
     
     // Hidden layer
@@ -58,7 +53,6 @@ function evolvePopulation(population, sortedBirdIndexes, populationSize, mutatio
     const newPopulation = [];
     
     try {
-        // Copy best networks (elitism)
         const bestNetwork = population[sortedBirdIndexes[0]];
         const secondBestNetwork = population[sortedBirdIndexes[1]];
         
@@ -88,7 +82,7 @@ function evolvePopulation(population, sortedBirdIndexes, populationSize, mutatio
         return newPopulation;
     } catch (error) {
         console.error('Error in evolvePopulation:', error);
-        return population; // Return original population on error
+        return population; 
     }
 }
 
