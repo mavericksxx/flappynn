@@ -8,40 +8,38 @@ class UI {
         this.height = gameHeight;
         
         // Colors
-        this.WHITE = 'rgb(255, 255, 255)';
-        this.BLACK = 'rgb(0, 0, 0)';
-        this.GRAY = 'rgb(128, 128, 128)';
-        this.BLUE = 'rgb(0, 120, 255)';
-        this.HOVER_BLUE = 'rgb(0, 150, 255)';
+        this.WHITE = '#FFFFFF';
+        this.BLACK = '#000000';
+        this.GRAY = '#808080';
+        this.BLUE = '#0078FF';
+        this.HOVER_BLUE = '#0099FF';
         
         // Button dimensions
-        this.buttonWidth = 140;
-        this.speedButtonWidth = 160;
+        this.buttonWidth = 100;
         this.buttonHeight = 40;
-        this.buttonMargin = 30;
-        this.buttonSpacing = 15;
+        this.buttonSpacing = 20;
         
         // Calculate button positions
-        const buttonStartX = this.gameWidth + (this.metricsWidth - (this.buttonWidth * 2 + this.buttonSpacing)) / 2;
+        const startX = this.gameWidth + 20;
         
         // Create buttons
         this.buttons = {
             pause: {
-                x: buttonStartX,
-                y: 20,
-                width: this.buttonWidth,
-                height: this.buttonHeight
-            },
-            restart: {
-                x: buttonStartX + this.buttonWidth + this.buttonSpacing,
+                x: startX,
                 y: 20,
                 width: this.buttonWidth,
                 height: this.buttonHeight
             },
             speed: {
-                x: this.gameWidth + (this.metricsWidth - this.speedButtonWidth) / 2,
-                y: 20 + this.buttonHeight + this.buttonSpacing,
-                width: this.speedButtonWidth,
+                x: startX + this.buttonWidth + this.buttonSpacing,
+                y: 20,
+                width: this.buttonWidth,
+                height: this.buttonHeight
+            },
+            restart: {
+                x: startX + (this.buttonWidth + this.buttonSpacing) * 2,
+                y: 20,
+                width: this.buttonWidth,
                 height: this.buttonHeight
             }
         };
@@ -54,13 +52,13 @@ class UI {
     }
     
     handleMouseMove(event) {
-        const canvasRect = event.target.getBoundingClientRect();
-        const scaleX = event.target.width / canvasRect.width;
-        const scaleY = event.target.height / canvasRect.height;
+        const rect = event.target.getBoundingClientRect();
+        const scaleX = event.target.width / rect.width;
+        const scaleY = event.target.height / rect.height;
         
         this.mousePos = {
-            x: (event.clientX - canvasRect.left) * scaleX,
-            y: (event.clientY - canvasRect.top) * scaleY
+            x: (event.clientX - rect.left) * scaleX,
+            y: (event.clientY - rect.top) * scaleY
         };
     }
     
@@ -80,30 +78,22 @@ class UI {
         // Draw buttons
         for (const [buttonName, button] of Object.entries(this.buttons)) {
             const hover = this.isPointInRect(this.mousePos, button);
-            const color = hover ? this.HOVER_BLUE : this.BLUE;
             
             // Button background
-            ctx.fillStyle = color;
-            ctx.globalAlpha = this.buttonAlpha / 255;
+            ctx.fillStyle = hover ? this.HOVER_BLUE : this.BLUE;
             ctx.fillRect(button.x, button.y, button.width, button.height);
-            ctx.globalAlpha = 1;
-            
-            // Button border
-            ctx.strokeStyle = this.WHITE;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(button.x, button.y, button.width, button.height);
             
             // Button text
             let text;
             if (buttonName === 'pause') {
                 text = this.paused ? "Resume" : "Pause";
-            } else if (buttonName === 'restart') {
-                text = "Restart";
-            } else {
+            } else if (buttonName === 'speed') {
                 text = `Speed: ${stats.speed}x`;
+            } else {
+                text = "Restart";
             }
             
-            ctx.font = '24px Arial';
+            ctx.font = '16px Arial';
             ctx.fillStyle = this.WHITE;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -140,9 +130,9 @@ class UI {
     }
     
     handleClick(pos) {
-        const canvasRect = document.getElementById('gameCanvas').getBoundingClientRect();
-        const scaleX = document.getElementById('gameCanvas').width / canvasRect.width;
-        const scaleY = document.getElementById('gameCanvas').height / canvasRect.height;
+        const rect = document.getElementById('gameCanvas').getBoundingClientRect();
+        const scaleX = document.getElementById('gameCanvas').width / rect.width;
+        const scaleY = document.getElementById('gameCanvas').height / rect.height;
         
         const scaledPos = {
             x: pos.x * scaleX,
