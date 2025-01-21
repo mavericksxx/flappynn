@@ -23,10 +23,19 @@ class Pipe {
         // Fallback colors if image fails to load
         this.pipeColor = '#74BF2E';
         this.pipeEdgeColor = '#4AA810';
+        
+        // Add gameWidth property
+        this.gameWidth = 800;  // Match game area width
     }
     
     update() {
-        this.x -= this.speed;
+        this.x -= 2;  // Move left
+        
+        // Reset pipe when it moves off screen
+        if (this.x + this.width < 0) {
+            this.x = this.gameWidth;  // Reset to game width instead of canvas width
+            this.gapY = Math.random() * (this.gameHeight - this.gapHeight - 100) + 50;
+        }
     }
     
     draw(ctx) {

@@ -1,25 +1,32 @@
 body {
     margin: 0;
-    padding: 20px;
+    padding: 0;
     background-color: #1a1a1a;
     color: white;
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    display: none;
 }
 
 canvas {
     display: block;
-    margin: 0 auto;
+    margin: 0;
     background-color: #000;
 }
 
 .controls {
-    text-align: center;
-    margin: 20px 0;
+    display: none;
+}
+
+.metrics {
+    display: none;
 }
 
 button {
@@ -34,12 +41,4 @@ button {
 
 button:hover {
     background-color: #0056b3;
-}
-
-.metrics {
-    width: 300px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
 } 

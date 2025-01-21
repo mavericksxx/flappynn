@@ -1,9 +1,10 @@
 class UI {
-    constructor(width, gameHeight, metricsWidth, bottomHeight) {
+    constructor(width, gameHeight, metricsWidth, bottomHeight, gameWidth) {
         this.width = width;
         this.gameHeight = gameHeight;
         this.metricsWidth = metricsWidth;
         this.bottomHeight = bottomHeight;
+        this.gameWidth = gameWidth;
         
         // Colors matching Python
         this.WHITE = 'rgb(255, 255, 255)';
@@ -73,9 +74,42 @@ class UI {
         // Use stored mouse position
         const mousePos = this.mousePos;
         
-        // Draw metrics background
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, this.gameHeight, this.metricsWidth, this.bottomHeight);
+        // Draw metrics background (now on the right side)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';  // Make background more opaque
+        ctx.fillRect(this.gameWidth, 0, this.metricsWidth, this.height);
+        
+        // Add a separator line
+        ctx.strokeStyle = this.GRAY;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.gameWidth, 0);
+        ctx.lineTo(this.gameWidth, this.height);
+        ctx.stroke();
+        
+        // Draw buttons (now on the right side)
+        const buttonStartX = this.gameWidth + (this.metricsWidth - this.buttonWidth * 2 - this.buttonSpacing) / 2;
+        
+        // Update button positions
+        this.buttons = {
+            pause: {
+                x: buttonStartX,
+                y: 20,  // Top margin
+                width: this.buttonWidth,
+                height: this.buttonHeight
+            },
+            restart: {
+                x: buttonStartX + this.buttonWidth + this.buttonSpacing,
+                y: 20,
+                width: this.buttonWidth,
+                height: this.buttonHeight
+            },
+            speed: {
+                x: this.gameWidth + (this.metricsWidth - this.speedButtonWidth) / 2,
+                y: 20 + this.buttonHeight + this.buttonSpacing,
+                width: this.speedButtonWidth,
+                height: this.buttonHeight
+            }
+        };
         
         // Draw buttons
         for (const [buttonName, button] of Object.entries(this.buttons)) {
@@ -111,7 +145,7 @@ class UI {
         }
         
         // Draw metrics text
-        let metricsY = this.gameHeight + 140;
+        let metricsY = 120;  // Start below buttons
         
         ctx.font = this.font;
         ctx.fillStyle = this.WHITE;
@@ -119,8 +153,8 @@ class UI {
         
         // Draw title
         const title = "Training Metrics";
-        ctx.fillText(title, this.metricsWidth/2, metricsY);
-        metricsY += 60;
+        ctx.fillText(title, this.gameWidth + this.metricsWidth/2, metricsY);
+        metricsY += 40;
         
         // Draw stats
         const statsText = [
@@ -130,8 +164,8 @@ class UI {
         ];
         
         for (const text of statsText) {
-            ctx.fillText(text, this.metricsWidth/2, metricsY);
-            metricsY += 40;
+            ctx.fillText(text, this.gameWidth + this.metricsWidth/2, metricsY);
+            metricsY += 30;
         }
     }
     

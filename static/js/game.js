@@ -4,11 +4,12 @@ class FlappyBirdGame {
         this.ctx = this.canvas.getContext('2d');
         
         // Match Python dimensions
-        this.width = 800;
-        this.height = 900;
-        this.gameHeight = 600;
-        this.bottomHeight = 300;
-        this.metricsWidth = 300;
+        this.width = 1200;          // Total canvas width
+        this.height = 600;          // Canvas height
+        this.gameWidth = 800;       // Game area width
+        this.gameHeight = 600;      // Game area height
+        this.metricsWidth = 400;    // Width of right panel
+        this.bottomHeight = this.height;  // Full height for right panel
         
         this.canvas.width = this.width;
         this.canvas.height = this.height;
@@ -40,7 +41,13 @@ class FlappyBirdGame {
         
         // Initialize game objects and UI first
         this.reset();
-        this.ui = new UI(this.width, this.gameHeight, this.metricsWidth, this.bottomHeight);
+        this.ui = new UI(
+            this.width,
+            this.gameHeight,
+            this.metricsWidth,
+            this.bottomHeight,
+            this.gameWidth  // Pass gameWidth to UI
+        );
         this.setupControls();
         
         // Load assets and start game when ready
@@ -137,7 +144,7 @@ class FlappyBirdGame {
         
         // Match Python pipe initialization
         for (let i = 0; i < 3; i++) {
-            const x = 800 + i * this.pipeDistance;
+            const x = this.gameWidth + i * this.pipeDistance;  // Start from game width
             this.pipes.push(new Pipe(x, this.gameHeight));
         }
     }
@@ -374,37 +381,38 @@ class FlappyBirdGame {
             return;
         }
         
-        // Clear the entire canvas
-        this.ctx.fillStyle = '#70c5ce';  // Sky blue background
+        // Clear the entire canvas first
+        this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.width, this.height);
         
-        // Draw bottom section first
-        this.ctx.fillStyle = '#000000';
-        this.ctx.fillRect(0, this.gameHeight, this.width, this.bottomHeight);
+        // Save the current context state
+        this.ctx.save();
         
-        // Draw dividing lines
-        this.ctx.strokeStyle = '#646464';
-        this.ctx.lineWidth = 2;
+        // Create a clipping region for the game area
         this.ctx.beginPath();
-        this.ctx.moveTo(0, this.gameHeight);
-        this.ctx.lineTo(this.width, this.gameHeight);
-        this.ctx.moveTo(this.metricsWidth, this.gameHeight);
-        this.ctx.lineTo(this.metricsWidth, this.height);
-        this.ctx.stroke();
+        this.ctx.rect(0, 0, this.gameWidth, this.height);
+        this.ctx.clip();
         
-        // Draw game area background
+        // Draw game background
+        this.ctx.fillStyle = '#70c5ce';
+        this.ctx.fillRect(0, 0, this.gameWidth, this.height);
+        
+        // Draw background image
         if (this.background) {
-            this.ctx.drawImage(this.background, 0, 0, this.width, this.gameHeight);
+            this.ctx.drawImage(this.background, 0, 0, this.gameWidth, this.gameHeight);
         }
         
         // Draw game objects (pipes and birds)
         this.pipes.forEach(pipe => pipe.draw(this.ctx));
         this.birds.forEach(bird => bird.draw(this.ctx));
         
-        // Draw UI elements (metrics)
+        // Restore the context state (removes clipping)
+        this.ctx.restore();
+        
+        // Draw UI elements (metrics) - these will be drawn outside the game area
         this.ui.draw(this.ctx, this.stats);
         
-        // Draw neural network visualization with null checks
+        // Draw neural network visualization
         const aliveBird = this.birds.find(b => b.alive);
         if (aliveBird && this.pipes.length > 0) {
             const closestPipe = this.pipes.find(p => p.x + p.width > aliveBird.x);
@@ -435,11 +443,11 @@ class FlappyBirdGame {
         const NEGATIVE_COLOR = 'rgb(255, 0, 0)';
         const BACKGROUND_COLOR = 'rgb(20, 20, 20)';
         
-        // Calculate positions
-        const x = this.metricsWidth + 20;
-        const y = this.gameHeight + 10;
-        const width = this.width - this.metricsWidth - 30;
-        const height = this.bottomHeight - 20;
+        // Calculate positions for the right side panel
+        const x = this.gameWidth + 20;  // Start after game area
+        const y = 250;  // Start below metrics
+        const width = this.metricsWidth - 40;  // Leave margins
+        const height = 300;  // Fixed height for network visualization
         
         // Draw background
         this.ctx.fillStyle = BACKGROUND_COLOR;
