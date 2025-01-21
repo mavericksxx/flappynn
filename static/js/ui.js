@@ -19,8 +19,10 @@ class UI {
         this.buttonHeight = 40;
         this.buttonSpacing = 20;
         
-        // Calculate button positions
-        const startX = this.gameWidth + 20;
+        // Calculate total width of all buttons and spacing
+        const totalButtonWidth = (this.buttonWidth * 3) + (this.buttonSpacing * 2);
+        // Calculate starting X to center the buttons
+        const startX = this.gameWidth + (this.metricsWidth - totalButtonWidth) / 2;
         
         // Create buttons
         this.buttons = {
